@@ -4,8 +4,19 @@ def main():
 
     text = book_contents(book_path)
     wCount = wordCount(text)
-    cCount = charCount(text)
-    print(cCount)
+    cCount = charCount_cooked(charCount(text))
+
+    print(f"--- Begin report on {book_path} ---")
+    print(f"{wCount} words found in the document")
+    print()
+    for item in cCount:
+        # VS says .isalpha isn't defined, but it still works when ran *shrug*
+        if not item["char"].isalpha():
+            continue
+        char = item["char"]
+        count = item["num"]
+        print(f"The {char} character was found {count} times")
+    print("--- End report ---")
 
 # Reads in a file and returns a string of text
 def book_contents(book_path):
@@ -32,7 +43,23 @@ def charCount(text):
             charDict[char] += 1
         else:
             charDict[char] = 1
+            
     return charDict
+
+# Necessary weird function to pass into .sort
+def sort_on(dict):
+    return dict["num"]
+
+# Cooked converting the char dict into a list that can be ordered (why bother)
+def charCount_cooked(dict):
+    charList = []
+    # Making a list of dicts makes sense, but not in this application tbh
+    # I feel like writing our own sorting function for the dict would have been a better challenge
+    for c in dict:
+        charList.append({"char": c, "num": dict[c]})
+    # The accursed .sort (reverse=True just means bigger number go first)
+    charList.sort(reverse=True, key=sort_on)
+    return charList
 
 # ***** MAIN *****
 main()
